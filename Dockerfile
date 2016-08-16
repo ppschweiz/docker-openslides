@@ -1,6 +1,8 @@
-FROM python:2
+FROM python:3.5.2
 ENV RESETADMIN "/data/resetadmin"
 RUN pip install openslides
+RUN pip install html5lib==1.0b8
+RUN sed -i 's/^\(html5lib>=0.9\).*/\1/' /usr/local/lib/python3.5/site-packages/openslides-*/requires.txt
 RUN mkdir /data
 RUN mkdir /data/config
 RUN mkdir /data/share
@@ -11,7 +13,5 @@ RUN ln -s /data/share /root/.local/share/openslides
 RUN touch "$RESETADMIN"
 VOLUME /data
 EXPOSE 80
-CMD openslides syncdb; \
-    test -e "$RESETADMIN" && openslides createsuperuser && rm "$RESETADMIN"; \
-    openslides runserver
-
+CMD test -e "$RESETADMIN" && openslides createsuperuser && rm "$RESETADMIN"; \
+    openslides runserver 0.0.0.0:80
